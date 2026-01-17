@@ -1,0 +1,1 @@
+// Logic migrated to index.html as requested.

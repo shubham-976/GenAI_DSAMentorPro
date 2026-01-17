@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Mentor Pro | Dark Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #020617; }
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-track { background: transparent; }
+        .chat-container::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        .chat-container::-webkit-scrollbar-thumb:hover { background: #334155; }
+        
+        .message-animation {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .typing-dot { animation: typing 1.4s infinite; }
+        @keyframes typing { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* Code block styling */
+        pre {
+            background: #0f172a !important;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin: 0.5rem 0;
+            overflow-x: auto;
+            border: 1px solid #1e293b;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        code { color: #818cf8; }
+    </style>
+</head>
+<body class="text-slate-200 h-screen flex flex-col overflow-hidden">
+
+    <!-- Navbar -->
+    <nav class="bg-slate-900/50 backdrop-blur-md border-b border-slate-800 py-4 px-6 flex items-center justify-between shadow-2xl z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.4)]">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold text-slate-100 tracking-tight">DSA Mentor Pro</h1>
+                <p class="text-[10px] text-indigo-400 font-bold tracking-[0.2em] uppercase">Instructor Mode</p>
+            </div>
+        </div>
+        <button id="reset-session" class="text-[10px] font-black text-slate-500 hover:text-indigo-400 uppercase tracking-widest transition-all px-4 py-2 border border-slate-800 rounded-lg hover:bg-slate-800 hover:border-slate-700">
+            Reset Session
+        </button>
+    </nav>
+
+    <!-- Chat Messages -->
+    <main id="chat-box" class="flex-grow overflow-y-auto p-4 md:p-8 space-y-8 chat-container">
+        <!-- AI Initial -->
+        <div class="flex justify-start message-animation">
+            <div class="max-w-[85%] md:max-w-[75%] bg-slate-900 border border-slate-800 p-5 rounded-2xl rounded-tl-none shadow-xl">
+                <p class="text-[10px] font-bold text-indigo-400 mb-2 uppercase tracking-widest">Instructor</p>
+                <div class="text-sm text-slate-300 leading-relaxed">
+                    Hello! I am your dedicated **Data Structures and Algorithms (DSA)** instructor. I'm here to help you master concepts like Big O analysis, sorting, trees, and more. What shall we explore today?
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading -->
+    <div id="loader" class="hidden px-8 pb-4">
+        <div class="flex items-center gap-3 text-slate-500 text-[10px] font-bold tracking-widest uppercase">
+            <div class="flex gap-1">
+                <span class="typing-dot w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
+                <span class="typing-dot w-1.5 h-1.5 bg-indigo-500 rounded-full" style="animation-delay: 0.2s"></span>
+                <span class="typing-dot w-1.5 h-1.5 bg-indigo-500 rounded-full" style="animation-delay: 0.4s"></span>
+            </div>
+            Processing Algorithm...
+        </div>
+    </div>
+
+    <!-- Footer Input -->
+    <div class="bg-slate-900/80 border-t border-slate-800 p-4 md:p-6 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.4)] backdrop-blur-lg">
+        <form id="chat-form" class="max-w-4xl mx-auto flex gap-4 items-end">
+            <div class="flex-grow relative group">
+                <textarea 
+                    id="user-input" 
+                    rows="1" 
+                    class="w-full bg-slate-950 border border-slate-800 text-slate-100 rounded-2xl py-4 pl-5 pr-14 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500/50 transition-all resize-none placeholder:text-slate-600 shadow-inner"
+                    placeholder="Ask about dynamic programming, BFS, or hash maps..."
+                ></textarea>
+                <div class="absolute right-4 bottom-4 text-[10px] text-slate-700 font-mono hidden md:block">
+                    ENTER to Send
+                </div>
+            </div>
+            <button 
+                type="submit" 
+                id="send-btn"
+                class="bg-indigo-600 hover:bg-indigo-500 text-white p-4 rounded-2xl transition-all shadow-[0_5px_15px_rgba(79,70,229,0.4)] active:scale-90 disabled:opacity-40"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^1.37.0"
+      }
+    }
+    </script>
+    <script type="module">
+        import { GoogleGenAI } from "@google/genai";
+
+        const chatBox = document.getElementById('chat-box');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const loader = document.getElementById('loader');
+        const resetBtn = document.getElementById('reset-session');
+
+        const systemPrompt = `You are a DSA instructor, which helps students to learn Data Structures and Algorithms (DSA) concepts with easy to understand examples.
+If someone asks you anything not related to DSA, you politely refuse to answer them and remind them that you are a DSA instructor and only answer DSA related questions.
+Use clean Markdown. Wrap code in appropriate triple-backtick blocks. Ensure explanations are step-by-step.`;
+
+        let ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        let chatSession = ai.chats.create({
+            model: 'gemini-3-flash-preview',
+            config: { systemInstruction: systemPrompt }
+        });
+
+        function addMessage(role, text) {
+            const isModel = role === 'model';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${isModel ? 'justify-start' : 'justify-end'} message-animation`;
+            
+            msgDiv.innerHTML = `
+                <div class="max-w-[85%] md:max-w-[75%] ${isModel ? 'bg-slate-900 border border-slate-800 text-slate-300' : 'bg-indigo-600 text-white shadow-lg'} p-5 rounded-2xl ${isModel ? 'rounded-tl-none' : 'rounded-tr-none'}">
+                    <p class="text-[10px] font-black ${isModel ? 'text-indigo-400' : 'text-indigo-200'} mb-2 uppercase tracking-widest">
+                        ${isModel ? 'Instructor' : 'Student'}
+                    </p>
+                    <div class="text-sm leading-relaxed prose prose-invert max-w-none">
+                        ${formatText(text)}
+                    </div>
+                </div>
+            `;
+            
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Simple markdown code block detection
+        function formatText(text) {
+            // Replace triple backticks with formatted pre/code blocks
+            return text.replace(/```(\w+)?([\s\S]*?)```/g, (match, lang, code) => {
+                return `<pre><code>${code.trim()}</code></pre>`;
+            }).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+
+        async function handleSend(e) {
+            if (e) e.preventDefault();
+            const msg = userInput.value.trim();
+            if (!msg) return;
+
+            addMessage('user', msg);
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            loader.classList.remove('hidden');
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await chatSession.sendMessage({ message: msg });
+                loader.classList.add('hidden');
+                addMessage('model', response.text);
+            } catch (err) {
+                loader.classList.add('hidden');
+                addMessage('model', "Apologies, the server timed out. Let's try that query again.");
+                console.error(err);
+            }
+        }
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        });
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        resetBtn.addEventListener('click', () => {
+            chatSession = ai.chats.create({
+                model: 'gemini-3-flash-preview',
+                config: { systemInstruction: systemPrompt }
+            });
+            chatBox.innerHTML = '';
+            addMessage('model', "Workspace cleared. Instructor ready for a new topic. What shall we discuss?");
+        });
+
+        chatForm.addEventListener('submit', handleSend);
+    </script>
+</body>
+</html>
